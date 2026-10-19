@@ -1,11 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class AlienFleet : MonoBehaviour
 {
     [Header("Inscribed")]
 
     public GameObject alienPrefab;
+
+    public AlienCounter alienCounter;
 
     public List<GameObject> aliens = new List<GameObject> { };
 
@@ -29,12 +32,13 @@ public class AlienFleet : MonoBehaviour
                 alien.GetComponent<Alien>().fleet = this;
             }
         }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        alienCounter.score = aliens.Count;
     }
 
     void FixedUpdate()
