@@ -3,40 +3,30 @@ using UnityEngine;
 public class Alien : MonoBehaviour
 {
     [Header("Inscribed")]
-
     public GameObject bulletPrefab;
     public AlienFleet fleet;
-    
+
     static float bulletSpawnRate = .002f;
-    public float lastShot = 0;
     public static float shotCooldown = .1f;
+    float lastShot = 0;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // FIX: removed empty Start() and Update(). Unity still calls them
+    // every frame for every alien, so they just waste time.
 
     void FixedUpdate()
     {
-        Vector3 position = transform.position;
-        
-        if(UnityEngine.Random.value < bulletSpawnRate && Time.time - lastShot > shotCooldown){
-            GameObject bullet = Instantiate<GameObject>(bulletPrefab);
-            bullet.transform.position = position;
+        if (Random.value < bulletSpawnRate && Time.time - lastShot > shotCooldown)
+        {
+            GameObject bullet = Instantiate(bulletPrefab);
+            bullet.transform.position = transform.position;
             lastShot = Time.time;
         }
     }
 
     void OnCollisionEnter(Collision coll)
     {
-        fleet.GetComponent<AlienFleet>().aliens.Remove(gameObject);
+        // FIX: fleet is already an AlienFleet, no need for GetComponent
+        fleet.AlienDestroyed(gameObject);
         Destroy(gameObject);
         Destroy(coll.gameObject);
     }
