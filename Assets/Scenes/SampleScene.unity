@@ -805,6 +805,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8270462056835086372, guid: 34725686c1348b247a77b3f974763d41, type: 3}
+      propertyPath: maxSpeed
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: -8270462056835086372, guid: 34725686c1348b247a77b3f974763d41, type: 3}
+      propertyPath: startSpeed
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: -8270462056835086372, guid: 34725686c1348b247a77b3f974763d41, type: 3}
       propertyPath: alienCounter
       value: 
       objectReference: {fileID: 970817118}

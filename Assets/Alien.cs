@@ -6,7 +6,8 @@ public class Alien : MonoBehaviour
     public GameObject bulletPrefab;
     public AlienFleet fleet;
 
-    static float bulletSpawnRate = .002f;
+    // BALANCE: was .002, now aliens shoot 2x more
+    static float bulletSpawnRate = .004f;
     public static float shotCooldown = .1f;
     float lastShot = 0;
 

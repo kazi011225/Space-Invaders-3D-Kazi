@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class AlienBullet : MonoBehaviour
 {
-    static float speed = .1f;
+    // BALANCE: was .1, bullets come down faster now
+    static float speed = .15f;
 
     // FIX: removed empty Start() and Update()
 

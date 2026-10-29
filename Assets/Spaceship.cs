@@ -10,7 +10,8 @@ public class Spaceship : MonoBehaviour
     public int lives = 3;
     public float safeTime = 1.5f;       // can't get hit again right after a hit
 
-    public static float shotCooldown = .05f;
+    // BALANCE: was .05, no more spamming the space bar
+    public static float shotCooldown = .4f;
     float lastShot = 0;
     float lastHit = -100;
 
