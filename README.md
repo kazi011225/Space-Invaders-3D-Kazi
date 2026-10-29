@@ -28,6 +28,6 @@ Made with Unity 6.6 (6000.6.7f1). Open `Assets/Scenes/SampleScene` and press Pla
 
 ## Extra features (picked 4)
 - **Balance:** player can't spam shots anymore (cooldown 0.05s to 0.4s), aliens shoot 2x more often, alien bullets are faster, and the fleet moves faster. Still beatable with 3 lives.
-- **Lives:** player has 3 lives shown next to the alien count. After a hit, the ship is safe for 1.5 seconds. (`Spaceship.Hit`)
+- **Lives:** player has 3 lives shown next to the alien count. After a hit, the ship blinks and is safe for 1.5 seconds, so a group of bullets cannot take all your lives at once. (`Spaceship.Hit`)
 - **Start and end screen:** the game waits on a start screen until Space is pressed. The end screen shows YOU WIN or GAME OVER with how many aliens were destroyed, and R restarts. (`GameScreens.cs`)
 - **New background:** Helix Nebula image from NASA (images.nasa.gov), on an unlit quad behind the game.
