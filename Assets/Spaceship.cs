@@ -23,6 +23,15 @@ public class Spaceship : MonoBehaviour
         counter = FindFirstObjectByType<AlienCounter>();
         fleet = FindFirstObjectByType<AlienFleet>();
         counter.SetLives(lives);
+
+        // FIX: bullets were pushing and turning the ship when it got hit.
+        // Kinematic = physics can't move it, only our code moves it.
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+        }
     }
 
     void Update()
@@ -46,6 +55,7 @@ public class Spaceship : MonoBehaviour
         position.x = Mathf.Clamp(position.x, minX, maxX);
 
         transform.position = position;
+        transform.rotation = Quaternion.identity;  // always stay straight
 
         if (Keyboard.current.spaceKey.wasPressedThisFrame && Time.time - lastShot > shotCooldown)
         {

@@ -24,6 +24,7 @@ Made with Unity 6.6 (6000.6.7f1). Open `Assets/Scenes/SampleScene` and press Pla
 6. **Two loops over the same list** (`AlienFleet.FixedUpdate`). Moving the aliens and finding the edges are now done in one loop.
 7. **Unused using lines** removed from `AlienFleet.cs` and `AlienCounter.cs`.
 8. **Alien counter was offscreen on smaller windows.** It was placed at a fixed spot from the center. I anchored it to the top left corner so it shows on any screen size.
+9. **Ship got knocked crooked when hit.** The original code destroyed the ship on the first hit, so this never showed. With lives, the ship survives, and the bullet's physics push turned it. Now the ship is kinematic with rotation frozen, so only our code moves it. (`Spaceship.Start`)
 
 ## Extra features (picked 4)
 - **Balance:** player can't spam shots anymore (cooldown 0.05s to 0.4s), aliens shoot 2x more often, alien bullets are faster, and the fleet moves faster. Still beatable with 3 lives.
