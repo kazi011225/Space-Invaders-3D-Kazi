@@ -8,8 +8,8 @@ public class AlienFleet : MonoBehaviour
     public AlienCounter alienCounter;
 
     [Header("Speed")]
-    public float startSpeed = .1f;   // speed when all aliens are alive
-    public float maxSpeed = .35f;    // speed when only 1 alien is left
+    public float startSpeed = .12f;  // BALANCE: speed when all aliens are alive
+    public float maxSpeed = .45f;    // BALANCE: speed when only 1 alien is left
     public float dropSpeed = .1f;    // how fast they go down at the edge
 
     [Header("Dynamic")]
@@ -23,9 +23,13 @@ public class AlienFleet : MonoBehaviour
     bool movingDown = false;
     bool gameOver = false;
     float loseLine;         // if any alien gets this low, player can't win
+    GameScreens screens;
 
     void Start()
     {
+        // add the start/end screens (this also pauses the game until SPACE)
+        screens = gameObject.AddComponent<GameScreens>();
+
         speed = startSpeed;
 
         for (int i = 0; i < 10; i++)
@@ -130,8 +134,11 @@ public class AlienFleet : MonoBehaviour
 
     public void EndGame(string message)
     {
+        if (gameOver) return;   // only end the game one time
         gameOver = true;
-        alienCounter.ShowMessage(message);
-        Time.timeScale = 0; // freeze the game
+        Time.timeScale = 0;     // freeze the game
+
+        bool won = aliens.Count == 0;
+        screens.ShowEnd(message, won, startCount - aliens.Count, startCount);
     }
 }
