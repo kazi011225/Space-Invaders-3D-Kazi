@@ -4,16 +4,30 @@ using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using TMPro;
 
-// Shows the start screen and the end screen.
+// Shows the start screen, the level clear screen, and the end screen.
 // AlienFleet adds this script by itself, so no setup in Unity is needed.
 public class GameScreens : MonoBehaviour
 {
+    // LEVELS: static so it stays the same when the scene reloads for the next level
+    public static int level = 1;
+    public const int maxLevel = 3;
+
+    // This project keeps static values between Play sessions in the editor.
+    // So we reset the level every time Play is pressed.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetLevel()
+    {
+        level = 1;
+    }
+
     GameObject panel;           // dark box that covers the screen
     TextMeshProUGUI title;      // big text
     TextMeshProUGUI info;       // small text under it
 
     bool waitingToStart = true;
     bool gameEnded = false;
+    bool canGoNext = false;     // true when a level is cleared
+    float endTime;              // when the end screen showed up
 
     void Awake()
     {
@@ -30,30 +44,74 @@ public class GameScreens : MonoBehaviour
             panel.SetActive(false);
             Time.timeScale = 1;   // unfreeze the game
         }
-        // end screen: press R to play again
-        else if (gameEnded && Keyboard.current.rKey.wasPressedThisFrame)
+        // end screen: wait half a second so a held SPACE doesn't skip it
+        else if (gameEnded && Time.unscaledTime - endTime > .5f)
         {
-            Time.timeScale = 1;   // must unfreeze before reloading
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            if (canGoNext && Keyboard.current.spaceKey.wasPressedThisFrame)
+            {
+                level++;          // go to the next level
+                Reload();
+            }
+            else if (Keyboard.current.rKey.wasPressedThisFrame)
+            {
+                level = 1;        // start over from level 1
+                Reload();
+            }
         }
+    }
+
+    void Reload()
+    {
+        Time.timeScale = 1;   // must unfreeze before reloading
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void ShowStart()
     {
         Time.timeScale = 0;   // freeze everything until the player is ready
-        title.text = "SPACE INVADERS";
         title.color = Color.white;
-        info.text = "Arrow keys to move, SPACE to shoot\nPress SPACE to start";
+
+        if (level == 1)
+        {
+            title.text = "SPACE INVADERS";
+            info.text = "Arrow keys to move, SPACE to shoot. Beat " + maxLevel + " levels to win!\nPress SPACE to start";
+        }
+        else
+        {
+            title.text = "LEVEL " + level;
+            info.text = "More aliens, and they are faster!\nPress SPACE to start";
+        }
         panel.SetActive(true);
     }
 
-    // AlienFleet calls this when the game ends
+    // AlienFleet calls this when the game or level ends
     public void ShowEnd(string message, bool won, int destroyed, int total)
     {
         gameEnded = true;
-        title.text = message;
-        title.color = won ? Color.green : Color.red;
-        info.text = "Aliens destroyed: " + destroyed + " / " + total + "\nPress R to play again";
+        endTime = Time.unscaledTime;
+        string score = "Aliens destroyed: " + destroyed + " / " + total;
+
+        if (won && level < maxLevel)
+        {
+            // level cleared, more levels left
+            canGoNext = true;
+            title.text = "LEVEL " + level + " CLEAR!";
+            title.color = Color.green;
+            info.text = score + "\nPress SPACE for level " + (level + 1) + ", or R to start over";
+        }
+        else if (won)
+        {
+            // beat the last level
+            title.text = "YOU WIN!";
+            title.color = Color.green;
+            info.text = "You beat all " + maxLevel + " levels!\nPress R to play again";
+        }
+        else
+        {
+            title.text = message;
+            title.color = Color.red;
+            info.text = "You made it to level " + level + ". " + score + "\nPress R to play again";
+        }
         panel.SetActive(true);
     }
 
@@ -98,7 +156,7 @@ public class GameScreens : MonoBehaviour
         text.color = Color.white;
 
         RectTransform rt = text.rectTransform;
-        rt.sizeDelta = new Vector2(1600, size * 3);
+        rt.sizeDelta = new Vector2(1700, size * 3);
         rt.anchoredPosition = offset;
         return text;
     }

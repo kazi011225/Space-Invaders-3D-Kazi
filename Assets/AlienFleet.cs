@@ -12,10 +12,24 @@ public class AlienFleet : MonoBehaviour
     public float maxSpeed = .45f;    // BALANCE: speed when only 1 alien is left
     public float dropSpeed = .1f;    // how fast they go down at the edge
 
+    [Header("Levels")]
+    public int columns = 10;              // aliens in each row
+    public float levelSpeedBoost = .2f;   // each level is 20% faster
+
+    // alien color for each level (level 1 keeps the normal green)
+    static readonly Color[] levelColors =
+    {
+        Color.green,
+        new Color(1f, .8f, .1f),    // level 2: yellow
+        new Color(1f, .25f, .25f)   // level 3: red
+    };
+
     [Header("Dynamic")]
     public List<GameObject> aliens = new List<GameObject>();
 
     float speed;            // + means moving right, - means moving left
+    float levelStartSpeed;  // start speed after the level boost
+    float levelMaxSpeed;    // max speed after the level boost
     int startCount;         // how many aliens we started with
     float leftBound = -16;
     float rightBound = 16;
@@ -30,16 +44,29 @@ public class AlienFleet : MonoBehaviour
         // add the start/end screens (this also pauses the game until SPACE)
         screens = gameObject.AddComponent<GameScreens>();
 
-        speed = startSpeed;
+        // LEVELS: more rows and more speed on each level
+        int level = GameScreens.level;
+        int rows = 2 + level;                               // 3, 4, 5 rows
+        float boost = 1 + levelSpeedBoost * (level - 1);    // 1.0, 1.2, 1.4
+        levelStartSpeed = startSpeed * boost;
+        levelMaxSpeed = maxSpeed * boost;
+        speed = levelStartSpeed;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < columns; i++)
         {
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < rows; j++)
             {
                 GameObject alien = Instantiate(alienPrefab);
                 alien.transform.position = new Vector3(2 * i - 12, 10 - 2 * j, 0);
                 aliens.Add(alien);
                 alien.GetComponent<Alien>().fleet = this;
+
+                // LEVELS: new color so each level looks different
+                if (level > 1)
+                {
+                    int c = Mathf.Min(level, levelColors.Length) - 1;
+                    alien.GetComponent<Renderer>().material.color = levelColors[c];
+                }
             }
         }
         startCount = aliens.Count;
@@ -62,7 +89,8 @@ public class AlienFleet : MonoBehaviour
     // Alien calls this when it gets hit
     public void AlienDestroyed(GameObject alien)
     {
-        aliens.Remove(alien);
+        // if 2 darts hit the same alien at once, only count it one time
+        if (!aliens.Remove(alien)) return;
         alienCounter.SetRemaining(aliens.Count);
 
         if (aliens.Count == 0)
@@ -73,8 +101,8 @@ public class AlienFleet : MonoBehaviour
 
         // REQUIRED: less aliens = faster aliens
         // ratio goes from 1 (all alive) down to 0 (almost all dead)
-        float ratio = (aliens.Count - 1) / (float)(startCount - 1);
-        float newSpeed = Mathf.Lerp(maxSpeed, startSpeed, ratio);
+        float ratio = startCount > 1 ? (aliens.Count - 1) / (float)(startCount - 1) : 0;
+        float newSpeed = Mathf.Lerp(levelMaxSpeed, levelStartSpeed, ratio);
 
         // keep the same direction, only change how fast
         speed = Mathf.Sign(speed) * newSpeed;

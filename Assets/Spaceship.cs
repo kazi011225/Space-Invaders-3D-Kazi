@@ -9,7 +9,7 @@ public class Spaceship : MonoBehaviour
     public float edgePadding = 1f;      // space between ship and screen edge
     public int lives = 3;
     public float safeTime = 1.5f;       // can't get hit again right after a hit
-    public float blinkSpeed = 10f;      // NEW: how fast the ship blinks when safe
+    public float blinkSpeed = 10f;      // how fast the ship blinks when safe
 
     // BALANCE: was .05, no more spamming the space bar
     public static float shotCooldown = .4f;
@@ -18,7 +18,7 @@ public class Spaceship : MonoBehaviour
 
     AlienCounter counter;
     AlienFleet fleet;
-    Renderer[] parts;                   // NEW: all the visible pieces of the ship
+    Renderer[] parts;                   // all the visible pieces of the ship
 
     void Start()
     {
@@ -26,7 +26,7 @@ public class Spaceship : MonoBehaviour
         fleet = FindFirstObjectByType<AlienFleet>();
         counter.SetLives(lives);
 
-        // NEW: the ship is made of a few pieces, get all of them for blinking
+        // the ship is made of a few pieces, get all of them for blinking
         parts = GetComponentsInChildren<Renderer>();
 
         // FIX: bullets were pushing and turning the ship when it got hit.
@@ -44,7 +44,7 @@ public class Spaceship : MonoBehaviour
         // game is frozen (win or lose), so no moving or shooting
         if (Time.timeScale == 0) return;
 
-        // NEW: blink while safe, so the player knows hits don't count right now
+        // blink while safe, so the player knows hits don't count right now
         bool safe = Time.time - lastHit < safeTime;
         bool visible = !safe || Mathf.FloorToInt(Time.time * blinkSpeed) % 2 == 0;
         foreach (Renderer part in parts)
@@ -88,10 +88,17 @@ public class Spaceship : MonoBehaviour
         lives--;
         counter.SetLives(lives);
 
+        // ANIMATION: orange boom, a big one on the last life
+        Color orange = new Color(1f, .6f, .1f);
         if (lives <= 0)
         {
+            Explosion.Spawn(transform.position, orange, 30, 1.6f);
             gameObject.SetActive(false);  // hide the ship
             fleet.EndGame("GAME OVER");
+        }
+        else
+        {
+            Explosion.Spawn(transform.position, orange, 10, .8f);
         }
     }
 }

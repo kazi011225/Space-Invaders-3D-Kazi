@@ -26,6 +26,10 @@ public class Alien : MonoBehaviour
 
     void OnCollisionEnter(Collision coll)
     {
+        // ANIMATION: boom in the same color as this alien
+        Color color = GetComponent<Renderer>().material.color;
+        Explosion.Spawn(transform.position, color);
+
         // FIX: fleet is already an AlienFleet, no need for GetComponent
         fleet.AlienDestroyed(gameObject);
         Destroy(gameObject);

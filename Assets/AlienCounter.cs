@@ -11,6 +11,7 @@ public class AlienCounter : MonoBehaviour
     void Awake()
     {
         uiText = GetComponent<TextMeshProUGUI>();
+        uiText.textWrappingMode = TextWrappingModes.NoWrap;  // keep it on one line
     }
 
     // FIX: no more Update(). Text only changes when something changes.
@@ -28,7 +29,9 @@ public class AlienCounter : MonoBehaviour
 
     void Refresh()
     {
-        uiText.text = "Remaining Aliens: " + remaining.ToString("#,0") + "     Lives: " + lives;
+        uiText.text = "Level: " + GameScreens.level
+                    + "     Aliens Left: " + remaining.ToString("#,0")
+                    + "     Lives: " + lives;
     }
 
     public void ShowMessage(string message)
